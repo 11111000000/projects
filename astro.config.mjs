@@ -1,7 +1,0 @@
-import { defineConfig } from 'astro/config';
-
-export default defineConfig({
-  output: 'static',
-  base: '/projects/',
-  site: process.env.SITE_URL || 'https://11111000000.github.io/projects'
-});
