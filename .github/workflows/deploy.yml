@@ -24,7 +24,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: SITE_URL=https://11111000000.github.io/projects npm run build
+        run: SITE_URL=https://11111000000.github.io/projects BASE_PATH=/projects npm run build
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
