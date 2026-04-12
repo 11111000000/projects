@@ -2,7 +2,7 @@
 // @ts-nocheck
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DashboardSidebar from '../components/DashboardSidebar.astro';
-import ProjectDiagramCard from '../components/ProjectDiagramCard.astro';
+import ProjectHealthDashboard from '../components/ProjectHealthDashboard.astro';
 import { loadProjectResearch } from '../lib/project-research.js';
 
 const research = await loadProjectResearch();
@@ -859,7 +859,7 @@ const projectSummaries = projects.map((project) => ({
       <h2>Прогресс по слоям</h2>
     </header>
     <div class="donut-grid">
-      {donutRows.map((row) => <ProjectDiagramCard name={row.name} progress={row.progress} hologram={row.hologram} spec={row.spec} done={row.done} total={row.total} compact={false} />)}
+      {donutRows.map((row, index) => <ProjectHealthDashboard name={row.name} progress={row.progress} hologram={row.hologram} spec={row.spec} done={row.done} total={row.total} commitDetails={projects[index]?.commitDetails || []} gantt={projects[index]?.gantt || []} compact={false} />)}
     </div>
   </section>
 

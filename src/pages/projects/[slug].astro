@@ -2,7 +2,7 @@
 // @ts-nocheck
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import DashboardSidebar from '../../components/DashboardSidebar.astro';
-import ProjectDiagramCard from '../../components/ProjectDiagramCard.astro';
+import ProjectHealthDashboard from '../../components/ProjectHealthDashboard.astro';
 import { loadProjectResearch } from '../../lib/project-research.js';
 import { catalog } from '../../lib/catalog.js';
 
@@ -99,14 +99,15 @@ const article = resolvedProject.article || {
   </section>
 
   <section class="diagram-section">
-    <ProjectDiagramCard
+    <ProjectHealthDashboard
       name={resolvedProject.name}
       progress={resolvedProject.progress}
       hologram={resolvedProject.hologramProgress}
       spec={resolvedProject.specProgress}
       done={resolvedProject.totalDone}
       total={resolvedProject.totalVolume}
-      activityMonths={projectActivityMonths}
+      commitDetails={resolvedProject.commitDetails || []}
+      gantt={resolvedProject.gantt || []}
       compact={true}
     />
   </section>
@@ -134,6 +135,16 @@ const article = resolvedProject.article || {
     </div>
     <p>{article.tradeoffs}</p>
     <p class="article-assessment">{article.assessment}</p>
+    {article.sources?.length ? (
+      <div class="article-sources">
+        <strong>Источники</strong>
+        <ul>
+          {article.sources.map((source) => (
+            <li><code>{source.path}</code> - {source.note}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null}
   </section>
 
   <section class="status-legend">
@@ -294,6 +305,10 @@ const article = resolvedProject.article || {
   .article-grid strong { display: block; margin-bottom: 8px; text-transform: uppercase; font-size: 0.78rem; color: var(--muted); }
   .article-grid ul { margin: 0; padding-left: 18px; color: var(--text); display: grid; gap: 6px; }
   .article-assessment { margin-top: 12px; font-weight: 600; color: var(--text); }
+  .article-sources { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .article-sources strong { display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; }
+  .article-sources ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  .article-sources code { font-family: ui-monospace, monospace; font-size: 0.9em; }
   .hologram-panel { border-color: #3b82f6; }
   .holo-state { font-weight: 700; margin: 0 0 8px; color: #3b82f6; text-transform: uppercase; font-size: 0.9rem; }
   .holo-summary { margin: 0 0 16px; color: var(--muted); line-height: 1.6; }

@@ -3,6 +3,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DashboardSidebar from '../components/DashboardSidebar.astro';
 import { loadProjectResearch } from '../lib/project-research.js';
+import ProjectHealthDashboard from '../components/ProjectHealthDashboard.astro';
 
 const research = await loadProjectResearch();
 const projects = research.projects;
@@ -58,6 +59,22 @@ const projectSummaries = projects.map((project) => ({
     ))}
   </section>
 
+  <section class="dashboard-strip">
+    {projects.map((project) => (
+      <ProjectHealthDashboard
+        name={project.name}
+        progress={project.progress}
+        hologram={project.hologramProgress}
+        spec={project.specProgress}
+        done={project.totalDone}
+        total={project.totalVolume}
+        commitDetails={project.commitDetails || []}
+        gantt={project.gantt || []}
+        compact={true}
+      />
+    ))}
+  </section>
+
   <section class="cards">
     {projects.map((project) => (
       <article class="card">
@@ -89,6 +106,7 @@ const projectSummaries = projects.map((project) => ({
   .cta { display: inline-flex; width: fit-content; color: var(--text); text-decoration: none; border: 1px solid var(--line); padding: 8px 12px; }
   .cta.secondary { color: var(--muted); }
   .metrics, .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  .dashboard-strip { display: grid; gap: 14px; margin-top: 16px; }
   .metric, .card { border: 1px solid var(--line); padding: 14px; background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); }
   .metric strong { display: block; font-size: 1.7rem; letter-spacing: -0.04em; font-family: inherit; }
   .metric span, .card p { color: var(--muted); }

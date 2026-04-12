@@ -1,0 +1,241 @@
+---
+const {
+  name,
+  progress = 0,
+  hologram = progress,
+  spec = progress,
+  done = 0,
+  total = 0,
+  commitDetails = [],
+  gantt = [],
+  compact = false
+} = Astro.props;
+
+const planPercent = total > 0 ? Math.round((done / total) * 100) : 0;
+const progressBars = [
+  { label: 'Итог', value: progress, color: '#2563eb' },
+  { label: 'Голограмма', value: hologram, color: '#8b5cf6' },
+  { label: 'Спека', value: spec, color: '#14b8a6' },
+  { label: 'План/факт', value: planPercent, color: '#f59e0b' }
+];
+
+const latestCommitDate = [...commitDetails]
+  .map((commit) => commit?.date)
+  .filter(Boolean)
+  .sort()
+  .at(-1) || new Date().toISOString().slice(0, 10);
+
+function toDate(dateKey) {
+  return new Date(`${dateKey}T00:00:00Z`);
+}
+
+function formatDay(dateKey) {
+  return new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' }).format(toDate(dateKey));
+}
+
+function formatLong(dateKey) {
+  return new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' }).format(toDate(dateKey));
+}
+
+const commitCounts = new Map();
+commitDetails.forEach((commit) => {
+  if (!commit?.date) return;
+  commitCounts.set(commit.date, (commitCounts.get(commit.date) || 0) + 1);
+});
+
+const latestDate = toDate(latestCommitDate);
+const heatmapDays = [];
+for (let i = 41; i >= 0; i -= 1) {
+  const date = new Date(latestDate);
+  date.setUTCDate(date.getUTCDate() - i);
+  const key = date.toISOString().slice(0, 10);
+  const count = commitCounts.get(key) || 0;
+  heatmapDays.push({ key, label: formatLong(key), count });
+}
+
+const heatmapMax = Math.max(1, ...heatmapDays.map((day) => day.count));
+const recent30 = heatmapDays.slice(-30).reduce((sum, day) => sum + day.count, 0);
+const recent14 = heatmapDays.slice(-14).reduce((sum, day) => sum + day.count, 0);
+const cumulativePoints = heatmapDays.reduce((acc, day) => {
+  const prev = acc.length ? acc[acc.length - 1].total : 0;
+  acc.push({ ...day, total: prev + day.count });
+  return acc;
+}, []);
+const sparkMax = Math.max(1, ...cumulativePoints.map((point) => point.total));
+const width = 300;
+const height = 96;
+const sparkPoints = cumulativePoints.map((point, index) => {
+  const x = cumulativePoints.length > 1 ? (index / (cumulativePoints.length - 1)) * width : width / 2;
+  const y = height - (point.total / sparkMax) * (height - 8) - 4;
+  return `${x},${y}`;
+});
+const sparkPath = sparkPoints.length ? `M ${sparkPoints.join(' L ')}` : '';
+
+function ganttLeft(start) {
+  return `${Math.max(0, (Math.min(8, start) - 1) / 8) * 100}%`;
+}
+
+function ganttWidth(span) {
+  return `${Math.max(8, Math.min(100, (span / 8) * 100))}%`;
+}
+---
+
+<article class={`health-dashboard ${compact ? 'compact' : ''}`}>
+  <div class="health-head">
+    <div>
+      <div class="eyebrow">Панель проекта</div>
+      <h3>{name}</h3>
+      <p>Активность, готовность и план/факт на одной странице.</p>
+    </div>
+    <div class="health-kpi">
+      <strong>{progress}%</strong>
+      <span>Итоговая готовность</span>
+    </div>
+  </div>
+
+  <section class="summary-grid">
+    {progressBars.map((item) => (
+      <div class="summary-tile">
+        <span>{item.label}</span>
+        <strong>{item.value}%</strong>
+        <div class="bar"><i style={`width:${item.value}%; background:${item.color}`}></i></div>
+      </div>
+    ))}
+    <div class="summary-tile wide">
+      <span>Активность 30 дней</span>
+      <strong>{recent30} коммитов</strong>
+      <div class="micro-meta">14 дней: {recent14} · Последний коммит: {formatLong(latestCommitDate)}</div>
+      <svg viewBox="0 0 300 96" aria-hidden="true">
+        <path d={sparkPath} class="spark-area"></path>
+        <path d={sparkPath} class="spark-line"></path>
+      </svg>
+    </div>
+  </section>
+
+  <section class="viz-grid">
+    <article class="viz-card">
+      <h4>Календарь активности</h4>
+      <div class="heatmap" aria-label={`Активность ${name} за последние 42 дня`}>
+        {heatmapDays.map((day) => {
+          const level = Math.round((day.count / heatmapMax) * 4);
+          return (
+            <span
+              class={`heat-cell lvl-${level}`}
+              title={`${day.label} · ${day.count} коммитов`}
+              aria-label={`${day.label}: ${day.count} коммитов`}
+              style={`background:#2563eb; opacity:${0.12 + level * 0.18}`}
+            ></span>
+          );
+        })}
+      </div>
+      <div class="legend-row">
+        <span>меньше</span>
+        <span>больше</span>
+      </div>
+    </article>
+
+    <article class="viz-card">
+      <h4>План / факт и зрелость</h4>
+      <div class="stacked-list">
+        <div class="stacked-row">
+          <span>Факт</span>
+          <div class="stacked-bar"><i style={`width:${progress}%`}></i></div>
+          <strong>{progress}%</strong>
+        </div>
+        <div class="stacked-row">
+          <span>Голограмма</span>
+          <div class="stacked-bar alt"><i style={`width:${hologram}%`}></i></div>
+          <strong>{hologram}%</strong>
+        </div>
+        <div class="stacked-row">
+          <span>Спека</span>
+          <div class="stacked-bar third"><i style={`width:${spec}%`}></i></div>
+          <strong>{spec}%</strong>
+        </div>
+        <div class="stacked-row">
+          <span>План</span>
+          <div class="stacked-bar plan"><i style={`width:${planPercent}%`}></i></div>
+          <strong>{done}/{total}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="gantt-section">
+    <h4>Мини-гант</h4>
+    <div class="gantt-list">
+      {gantt.map((task) => (
+        <article class={`gantt-row ${task.state || 'next'}`}>
+          <div class="gantt-labels">
+            <strong>{task.label}</strong>
+            <span>{task.state === 'done' ? 'завершено' : task.state === 'active' ? 'в работе' : 'следом'}</span>
+          </div>
+          <div class="gantt-track">
+            <i class={`gantt-span ${task.state || 'next'}`} style={`left:${ganttLeft(task.start)}; width:${ganttWidth(task.span)}`}></i>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</article>
+
+<style>
+  .health-dashboard {
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 20px;
+    background: color-mix(in oklab, var(--bg) 94%, var(--line) 6%);
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+  }
+  .health-dashboard.compact { padding: 16px; border-radius: 20px; gap: 14px; }
+  .health-head { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+  .health-head h3 { margin: 4px 0 0; text-transform: uppercase; letter-spacing: 0.04em; }
+  .health-head p, .micro-meta, .summary-tile span, .viz-card span { color: var(--muted); }
+  .eyebrow, .viz-card h4 { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; color: var(--muted); }
+  .health-kpi { min-width: 120px; text-align: right; border: 1px solid var(--line); padding: 10px 12px; }
+  .health-kpi strong { display: block; font-size: 2rem; line-height: 1; }
+  .summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .summary-tile { border: 1px solid var(--line); padding: 12px; display: grid; gap: 8px; min-width: 0; }
+  .summary-tile strong { font-size: 1.4rem; }
+  .summary-tile.wide { grid-column: span 2; }
+  .summary-tile svg { width: 100%; height: 96px; display: block; }
+  .spark-area { fill: rgba(37,99,235,0.12); stroke: none; }
+  .spark-line { fill: none; stroke: #2563eb; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+  .bar, .stacked-bar { height: 8px; border: 1px solid var(--line); overflow: hidden; background: transparent; }
+  .bar i, .stacked-bar i { display: block; height: 100%; }
+  .stacked-bar i { background: #2563eb; }
+  .stacked-bar.alt i { background: #8b5cf6; }
+  .stacked-bar.third i { background: #14b8a6; }
+  .stacked-bar.plan i { background: #f59e0b; }
+  .viz-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .viz-card, .gantt-section { border: 1px solid var(--line); padding: 14px; min-width: 0; }
+  .viz-card h4, .gantt-section h4 { margin: 0 0 10px; }
+  .heatmap {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .heat-cell { aspect-ratio: 1; border: 1px solid var(--line); display: block; }
+  .legend-row { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-top: 8px; text-transform: uppercase; }
+  .stacked-list { display: grid; gap: 10px; }
+  .stacked-row { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px; align-items: center; }
+  .stacked-row span { font-size: 0.78rem; text-transform: uppercase; }
+  .gantt-list { display: grid; gap: 8px; }
+  .gantt-row { display: grid; grid-template-columns: 128px 1fr; gap: 12px; align-items: center; }
+  .gantt-labels strong { display: block; font-size: 0.86rem; }
+  .gantt-labels span { font-size: 0.72rem; text-transform: uppercase; }
+  .gantt-track { position: relative; height: 14px; border: 1px solid var(--line); background: transparent; }
+  .gantt-span { position: absolute; top: 0; bottom: 0; display: block; }
+  .gantt-span.done { background: #10b981; }
+  .gantt-span.active { background: #f59e0b; }
+  .gantt-span.next { background: #2563eb; }
+  @media (max-width: 900px) {
+    .summary-grid, .viz-grid { grid-template-columns: 1fr; }
+    .summary-tile.wide { grid-column: auto; }
+    .health-head { flex-direction: column; }
+    .health-kpi { text-align: left; }
+    .gantt-row, .stacked-row { grid-template-columns: 1fr; }
+  }
+</style>
