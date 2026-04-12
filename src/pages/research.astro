@@ -97,7 +97,7 @@ const sections = [
     items: [
       'HOLO.md',
       'SURFACE.md',
-      'README/PLAN',
+      'README/план',
       'код',
       'тесты',
       'commits'
@@ -106,7 +106,7 @@ const sections = [
   {
     title: 'Ограничения',
     items: [
-      'Если данных нет, ставим unknown.',
+      'Если данных нет, ставим «неизвестно».',
       'Процент не должен следовать только из размера TODO-списка.',
       'Прототип не закрывает спецификацию.'
     ]
@@ -160,8 +160,8 @@ const sections = [
           <ul>
             {(project.article?.built || []).slice(0, 3).map((item) => <li>{item}</li>)}
           </ul>
-          <p class="article-caption">{project.article?.assessment}</p>
           <a href={`/projects/${project.slug}`}>Открыть подробную статью</a>
+          <p class="article-caption">{project.article?.assessment}</p>
         </article>
       ))}
     </div>
@@ -171,7 +171,7 @@ const sections = [
     <h2>Формула</h2>
     <p>hologramProgress = hologramDone / hologramTotal</p>
     <p>specProgress = specDone / specTotal</p>
-    <p>progress = 0.55 * hologramProgress + 0.45 * specProgress</p>
+    <p>прогресс = 0.55 * hologramProgress + 0.45 * specProgress</p>
   </section>
 
   <section class="research-card wide">
@@ -220,8 +220,8 @@ const sections = [
           <div class="fact-grid">
             <div><strong>План</strong><span>{row.plan}</span></div>
             <div><strong>Факт</strong><span>{row.fact}</span></div>
-            <div><strong>Progress</strong><span>{row.progress}%</span></div>
-            <div><strong>Freshness</strong><span>{row.freshness}</span></div>
+            <div><strong>Прогресс</strong><span>{row.progress}%</span></div>
+            <div><strong>Свежесть</strong><span>{row.freshness}</span></div>
           </div>
           <div class="proof-group">
             <strong>Источники</strong>
