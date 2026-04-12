@@ -1,0 +1,53 @@
+---
+const { projects, active } = Astro.props;
+---
+
+<div>
+  <nav class="nav">
+    <a class={active === 'home' ? 'active' : ''} href="/">Обзор</a>
+    <a class={active === 'report' ? 'active' : ''} href="/report">Отчёт</a>
+    <a class={active === 'research' ? 'active' : ''} href="/research">Исследование</a>
+    <a class={active === 'uha-6-0' ? 'active' : ''} href="/projects/uha-6-0">UHA-6.0</a>
+    <a class={active === 'genius' ? 'active' : ''} href="/projects/genius">Genius</a>
+    <a class={active === 'methoda' ? 'active' : ''} href="/projects/methoda">MethodA</a>
+  </nav>
+
+  <div class="metrics">
+    {projects.map((project) => (
+      <div class={`metric ${project.statusTone}`}>
+        <strong>{project.name}</strong>
+        <span>Итог {project.progress}% · Г {project.hologramProgress}% · С {project.specProgress}%</span>
+        <div class="bar"><span style={`width:${project.progress}%`}></span></div>
+      </div>
+    ))}
+  </div>
+
+  <p>Панель сигналов и навигации.</p>
+</div>
+
+<style>
+  .nav { display: grid; gap: 8px; }
+  .nav a {
+    padding: 8px 12px;
+    border-radius: 0;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    text-decoration: none;
+    background: transparent;
+  }
+  .nav a.active { color: var(--text); border-color: var(--text); }
+  .metrics { display: grid; gap: 12px; margin-top: 16px; }
+  .metric { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: 0; background: transparent; min-width: 0; }
+  .metric.good { border-color: #10b981; }
+  .metric.warn { border-color: #f59e0b; }
+  .metric.info { border-color: #3b82f6; }
+  .metric strong { font-size: 0.92rem; }
+  .metric span { color: var(--muted); font-size: 0.82rem; }
+  .bar { height: 8px; border-radius: 0; background: transparent; border: 1px solid var(--line); overflow: hidden; }
+  .bar > span { display: block; height: 100%; border-radius: 0; background: var(--text); }
+  .metric.good .bar > span { background: #10b981; }
+  .metric.warn .bar > span { background: #f59e0b; }
+  .metric.info .bar > span { background: #3b82f6; }
+  .metric.danger .bar > span { background: #ef4444; }
+  p { color: var(--muted); }
+</style>

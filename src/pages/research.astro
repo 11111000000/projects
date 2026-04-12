@@ -1,0 +1,396 @@
+---
+// @ts-nocheck
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DashboardSidebar from '../components/DashboardSidebar.astro';
+import { loadProjectResearch } from '../lib/project-research.js';
+
+const research = await loadProjectResearch();
+const projects = research.projects;
+
+function formatMonthKey(monthKey) {
+  const [year, month] = monthKey.split('-').map(Number);
+  return new Intl.DateTimeFormat('ru-RU', { month: 'short', year: 'numeric' }).format(
+    new Date(Date.UTC(year, month - 1, 1))
+  );
+}
+
+function buildTwoMonthActivity(commitDetails = []) {
+  const counts = new Map();
+  commitDetails.forEach((commit) => {
+    const monthKey = commit.date.slice(0, 7);
+    counts.set(monthKey, (counts.get(monthKey) || 0) + 1);
+  });
+  const sortedMonths = [...counts.keys()].sort();
+  const latestMonth = sortedMonths[sortedMonths.length - 1] || '2026-04';
+  const previousMonth = sortedMonths[sortedMonths.length - 2] || '2026-03';
+  const monthKeys = [previousMonth, latestMonth];
+  const maxCount = Math.max(...monthKeys.map((monthKey) => counts.get(monthKey) || 0), 1);
+
+  return monthKeys.map((monthKey) => ({
+    key: monthKey,
+    label: formatMonthKey(monthKey),
+    count: counts.get(monthKey) || 0,
+    percent: Math.round(((counts.get(monthKey) || 0) / maxCount) * 100)
+  }));
+}
+
+const sourceRows = projects.map((project) => ({
+  name: project.name,
+  sources: project.sourceFiles,
+  freshness: project.freshness,
+  conflicts: project.conflicts.length ? project.conflicts : ['нет явных конфликтов'],
+  activity: buildTwoMonthActivity(project.commitDetails || [])
+}));
+
+const matrixRows = projects.map((project) => ({
+  name: project.name,
+  plan: project.totalVolume,
+  fact: project.totalDone,
+  remaining: Math.max(project.totalVolume - project.totalDone, 0),
+  confidence: project.score,
+  holo: project.hologramProgress,
+  spec: project.specProgress,
+  risk: project.risk
+}));
+
+const evidenceRows = projects.map((project) => ({
+  name: project.name,
+  plan: project.totalVolume,
+  fact: project.totalDone,
+  progress: project.progress,
+  freshness: project.freshness,
+  sources: project.sourceFiles,
+  conflicts: project.conflicts,
+  topProofs: [
+    ...(project.holoDigest || []).slice(0, 2),
+    ...(project.doneItems || []).slice(0, 2),
+    ...(project.nextItems || []).slice(0, 2)
+  ]
+}));
+
+const confidenceGraphRows = projects.map((project) => ({
+  name: project.name,
+  confidence: project.score,
+  sources: project.sourceFiles.length,
+  conflicts: project.conflicts.length,
+  risk: project.risk
+}));
+
+const methodRows = [
+  { title: 'Шаг 1', text: 'Собираем документы, а не догадки.' },
+  { title: 'Шаг 2', text: 'Разделяем план, факт и доказательства.' },
+  { title: 'Шаг 3', text: 'Фиксируем противоречия как отдельный слой.' },
+  { title: 'Шаг 4', text: 'Считаем проценты только после сборки всех слоёв.' }
+];
+
+const sections = [
+  {
+    title: 'Метод',
+    items: [
+      'Разделение на голограмму и спека.',
+      'План и факт считаются раздельно.',
+      '100% разрешён только при полном наборе критериев.'
+    ]
+  },
+  {
+    title: 'Источники',
+    items: [
+      'HOLO.md',
+      'SURFACE.md',
+      'README/PLAN',
+      'код',
+      'тесты',
+      'commits'
+    ]
+  },
+  {
+    title: 'Ограничения',
+    items: [
+      'Если данных нет, ставим unknown.',
+      'Процент не должен следовать только из размера TODO-списка.',
+      'Прототип не закрывает спецификацию.'
+    ]
+  }
+];
+---
+
+<BaseLayout title="Исследование · ProjectsReview" description="Методика, источники и пруфы" active="research">
+  <Fragment slot="topbar">
+    <div>
+      <div class="eyebrow">Исследование</div>
+      <h1>Как считаются цифры</h1>
+      <p class="lead">Публичная страница метода: данные, формулы, пруфы и ограничения.</p>
+    </div>
+  </Fragment>
+
+  <Fragment slot="sidebar">
+    <DashboardSidebar projects={projects} active="research" />
+  </Fragment>
+
+  <section class="section-grid">
+    {sections.map((section) => (
+      <article class="research-card">
+        <h2>{section.title}</h2>
+        <ul>{section.items.map((item) => <li>{item}</li>)}</ul>
+      </article>
+    ))}
+  </section>
+
+  <section class="research-card wide">
+    <h2>Диалектический метод</h2>
+    <div class="method-grid">
+      {methodRows.map((row) => (
+        <article class="method-card">
+          <strong>{row.title}</strong>
+          <p>{row.text}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="research-card wide">
+    <h2>Сводные статьи проектов</h2>
+    <div class="summary-article-grid">
+      {projects.map((project) => (
+        <article class="summary-article">
+          <h3>{project.name}</h3>
+          <p class="project-summary-note">{project.summary}</p>
+          <p>{project.article?.lead}</p>
+          <ul>
+            {(project.article?.built || []).slice(0, 3).map((item) => <li>{item}</li>)}
+          </ul>
+          <p class="article-caption">{project.article?.assessment}</p>
+          <a href={`/projects/${project.slug}`}>Открыть подробную статью</a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="research-card">
+    <h2>Формула</h2>
+    <p>hologramProgress = hologramDone / hologramTotal</p>
+    <p>specProgress = specDone / specTotal</p>
+    <p>progress = 0.55 * hologramProgress + 0.45 * specProgress</p>
+  </section>
+
+  <section class="research-card wide">
+    <h2>Проблема читаемости</h2>
+    <div class="issue-grid">
+      <article class="issue-card">
+        <strong>Один активный круг</strong>
+        <p>Толстый кольцевой индикатор лучше читается, чем три тонких наложенных круга.</p>
+      </article>
+      <article class="issue-card">
+        <strong>Явный переключатель</strong>
+        <p>Легенда должна менять центральный слой и кольцо, а не просто показывать числа.</p>
+      </article>
+      <article class="issue-card">
+        <strong>Контраст трека</strong>
+        <p>Фон кольца должен быть заметно темнее, а активный слой толще и ярче.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="research-card wide">
+    <h2>Матрица план / факт</h2>
+    <div class="matrix-table">
+      <div class="matrix-head"><span>Проект</span><span>План</span><span>Факт</span><span>Остаток</span><span>Доверие</span><span>Г</span><span>С</span><span>Риск</span></div>
+      {matrixRows.map((row) => (
+        <div class="matrix-row">
+          <strong>{row.name}</strong>
+          <span>{row.plan}</span>
+          <span>{row.fact}</span>
+          <span>{row.remaining}</span>
+          <span>{row.confidence}%</span>
+          <span>{row.holo}%</span>
+          <span>{row.spec}%</span>
+          <span>{row.risk}%</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="research-card wide">
+    <h2>Пруф-матрица</h2>
+    <div class="evidence-grid">
+      {evidenceRows.map((row) => (
+        <article class="evidence-card">
+          <h3>{row.name}</h3>
+          <div class="fact-grid">
+            <div><strong>План</strong><span>{row.plan}</span></div>
+            <div><strong>Факт</strong><span>{row.fact}</span></div>
+            <div><strong>Progress</strong><span>{row.progress}%</span></div>
+            <div><strong>Freshness</strong><span>{row.freshness}</span></div>
+          </div>
+          <div class="proof-group">
+            <strong>Источники</strong>
+            <ul>{row.sources.map((item) => <li>{item}</li>)}</ul>
+          </div>
+          <div class="proof-group">
+            <strong>Конфликты</strong>
+            <ul>{(row.conflicts.length ? row.conflicts : ['нет']).map((item) => <li>{item}</li>)}</ul>
+          </div>
+          <div class="proof-group">
+            <strong>Пруфы</strong>
+            <ul>{row.topProofs.map((item) => <li>{item}</li>)}</ul>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="research-card wide">
+    <h2>Уверенность по проектам</h2>
+    <div class="confidence-bars">
+      {confidenceGraphRows.map((row) => (
+        <article class="confidence-line">
+          <strong>{row.name}</strong>
+          <div class="confidence-line-bars">
+            <div class="confidence-line-row">
+              <span>Confidence</span>
+              <div class="confidence-track"><i style={`width:${row.confidence}%`}></i></div>
+              <em>{row.confidence}%</em>
+            </div>
+            <div class="confidence-line-row">
+              <span>Sources</span>
+              <div class="confidence-track"><i style={`width:${Math.min(row.sources * 20, 100)}%`}></i></div>
+              <em>{row.sources}</em>
+            </div>
+            <div class="confidence-line-row">
+              <span>Conflicts</span>
+              <div class="confidence-track"><i style={`width:${Math.max(100 - row.conflicts * 30, 10)}%`}></i></div>
+              <em>{row.conflicts}</em>
+            </div>
+            <div class="confidence-line-row">
+              <span>Risk</span>
+              <div class="confidence-track"><i style={`width:${Math.max(100 - row.risk, 10)}%`}></i></div>
+              <em>{row.risk}%</em>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section-grid">
+    {sourceRows.map((project) => (
+      <article class="research-card">
+        <h2>{project.name}</h2>
+        <p>{project.freshness}</p>
+        <div class="fact-grid">
+          <div><strong>Источник</strong><span>{project.sources.length}</span></div>
+          <div><strong>Конфликты</strong><span>{project.conflicts.length}</span></div>
+          <div><strong>Месяц 1</strong><span>{project.activity[0]?.count ?? 0}</span></div>
+          <div><strong>Месяц 2</strong><span>{project.activity[1]?.count ?? 0}</span></div>
+        </div>
+        <div class="proof-group">
+          <strong>Источники</strong>
+          <ul>
+            {project.sources.map((item) => <li>{item}</li>)}
+            {project.conflicts.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <section class="research-card wide">
+    <h2>Активность по кодовым изменениям</h2>
+    <div class="activity-table">
+      {sourceRows.map((row) => (
+        <article class="activity-line">
+          <strong>{row.name}</strong>
+          <div class="activity-bars">
+            {row.activity.map((month) => (
+              <div class="activity-entry" title={`${row.name}: ${month.label} — ${month.count}`}>
+                <span>{month.label}</span>
+                <div class="activity-track"><i style={`width:${month.percent}%`}></i></div>
+                <strong>{month.count}</strong>
+              </div>
+            ))}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; color: var(--muted); }
+  h1 { margin: 8px 0 0; font-size: clamp(2rem, 4vw, 3rem); font-family: inherit; }
+  .lead { margin: 8px 0 0; color: var(--muted); line-height: 1.6; font-family: inherit; }
+  .section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 16px; }
+  .research-card.wide { margin-top: 16px; }
+  .research-card { border: 1px solid var(--line); background: var(--panel); padding: 16px; display: grid; gap: 12px; }
+  .research-card h2 { margin: 0; text-transform: uppercase; font-size: 0.95rem; font-family: inherit; }
+  .research-card ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--muted); }
+  .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .method-card { border: 1px solid var(--line); padding: 12px; display: grid; gap: 6px; }
+  .method-card strong { text-transform: uppercase; font-size: 0.78rem; color: var(--muted); }
+  .method-card p { margin: 0; color: var(--muted); line-height: 1.6; }
+  .summary-article-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .summary-article { border: 1px solid var(--line); padding: 14px; display: grid; gap: 10px; }
+  .summary-article h3 { margin: 0; text-transform: uppercase; font-size: 0.9rem; font-family: inherit; }
+  .summary-article p { margin: 0; color: var(--muted); line-height: 1.6; }
+  .summary-article ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--text); }
+  .article-caption { font-weight: 600; color: var(--text) !important; }
+  .summary-article a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--line); width: fit-content; }
+  .fact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .fact-grid div { border: 1px solid var(--line); padding: 10px; display: grid; gap: 4px; }
+  .fact-grid strong { text-transform: uppercase; font-size: 0.72rem; color: var(--muted); }
+  .fact-grid span { font-size: 1.2rem; }
+  .proof-group { display: grid; gap: 8px; }
+  .proof-group strong { text-transform: uppercase; font-size: 0.8rem; color: var(--muted); }
+  .proof-group ul { margin: 0; padding-left: 18px; }
+  .research-card p { margin: 0; color: var(--muted); line-height: 1.6; }
+  .project-summary-note { color: var(--text); }
+  .issue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .issue-card { border: 1px solid var(--line); padding: 12px; display: grid; gap: 6px; }
+  .issue-card strong { text-transform: uppercase; font-size: 0.8rem; color: var(--muted); }
+  .confidence-bars { display: grid; gap: 12px; }
+  .confidence-line { border: 1px solid var(--line); padding: 12px; display: grid; gap: 10px; }
+  .confidence-line strong { text-transform: uppercase; font-size: 0.9rem; }
+  .confidence-line-bars { display: grid; gap: 8px; }
+  .confidence-line-row { display: grid; grid-template-columns: 90px 1fr 52px; gap: 10px; align-items: center; }
+  .confidence-line-row span { color: var(--muted); text-transform: uppercase; font-size: 0.76rem; }
+  .confidence-line-row em { font-style: normal; text-align: right; color: var(--muted); }
+  .confidence-track { height: 10px; border: 1px solid var(--line); overflow: hidden; }
+  .confidence-track i { display: block; height: 100%; background: var(--text); }
+  .matrix-table { display: grid; gap: 8px; }
+  .matrix-head, .matrix-row { display: grid; grid-template-columns: 1.4fr repeat(7, minmax(0, 1fr)); gap: 8px; align-items: center; }
+  .matrix-head { text-transform: uppercase; font-size: 0.76rem; color: var(--muted); }
+  .matrix-row { border-top: 1px solid var(--line); padding-top: 8px; }
+  .matrix-row strong { font-weight: 600; }
+  .evidence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .evidence-card { border: 1px solid var(--line); padding: 14px; display: grid; gap: 12px; }
+  .evidence-card h3 { margin: 0; text-transform: uppercase; font-size: 0.9rem; }
+  .evidence-card ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  .activity-table { display: grid; gap: 12px; }
+  .activity-line { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .activity-line strong { text-transform: uppercase; font-size: 0.8rem; color: var(--muted); }
+  .activity-bars { display: grid; gap: 8px; }
+  .activity-entry { display: grid; grid-template-columns: 88px 1fr 28px; gap: 10px; align-items: center; }
+  .activity-entry span { color: var(--muted); text-transform: uppercase; font-size: 0.76rem; }
+  .activity-track { height: 10px; border: 1px solid var(--line); overflow: hidden; }
+  .activity-track i { display: block; height: 100%; background: var(--text); }
+  @media (max-width: 900px) {
+    .section-grid, .summary-article-grid, .issue-grid, .confidence-bars, .evidence-grid, .method-grid { grid-template-columns: 1fr; }
+    .research-card { padding: 12px; }
+    .fact-grid { grid-template-columns: 1fr; }
+    .matrix-head, .matrix-row { grid-template-columns: 1fr 1fr 1fr; }
+    .matrix-head span:nth-child(n+4), .matrix-row span:nth-child(n+4) { display: none; }
+    .confidence-line-row, .activity-entry { grid-template-columns: 72px 1fr 42px; }
+  }
+  @media (max-width: 640px) {
+    h1 { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+    .lead { font-size: 0.96rem; }
+    .research-card { padding: 10px; }
+    .summary-article, .method-card, .issue-card, .evidence-card, .confidence-line { padding: 10px; }
+    .matrix-head, .matrix-row { grid-template-columns: 1fr 1fr; }
+    .matrix-head span:nth-child(n+3), .matrix-row span:nth-child(n+3) { display: none; }
+    .activity-entry { grid-template-columns: 1fr; }
+    .activity-entry strong { text-align: left; }
+    .confidence-line-row { grid-template-columns: 1fr; }
+    .confidence-line-row em { text-align: left; }
+  }
+</style>

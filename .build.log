@@ -1,0 +1,32 @@
+
+> projects-review@1.0.0 build
+> astro build
+
+15:34:34 [types] Generated 78ms
+15:34:34 [build] output: "static"
+15:34:34 [build] directory: /home/zoya/Code/ProjectsReview/dist/
+15:34:34 [build] Collecting build info...
+15:34:34 [build] ✓ Completed in 90ms.
+15:34:34 [build] Building static entrypoints...
+15:34:35 [vite] ✓ built in 1.13s
+15:34:35 [build] ✓ Completed in 1.18s.
+
+ building client (vite) 
+15:34:35 [vite] transforming...
+15:34:35 [vite] ✓ 2 modules transformed.
+15:34:35 [vite] rendering chunks...
+15:34:35 [vite] ✓ built in 28ms
+
+ generating static routes 
+15:34:35 ▶ src/pages/projects/[slug].astro
+15:34:35   ├─ /projects/uha-6-0/index.html (+23ms)
+15:34:35   ├─ /projects/genius/index.html (+12ms)
+15:34:35   └─ /projects/methoda/index.html (+11ms)
+15:34:35 ▶ src/pages/report.astro
+15:34:35   └─ /report/index.html (+38ms)
+15:34:35 ▶ src/pages/index.astro
+15:34:35   └─ /index.html (+19ms)
+15:34:35 ✓ Completed in 159ms.
+
+15:34:35 [build] 5 page(s) built in 1.51s
+15:34:35 [build] Complete!

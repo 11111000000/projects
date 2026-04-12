@@ -1,0 +1,216 @@
+---
+const {
+  name,
+  progress = 0,
+  hologram = progress,
+  spec = progress,
+  done = 0,
+  total = 0,
+  activityMonths = [],
+  compact = false
+} = Astro.props;
+
+const parts = [
+  { key: 'progress', label: 'Итог', value: progress, color: '#2563eb' },
+  { key: 'hologram', label: 'Голограмма', value: hologram, color: '#8b5cf6' },
+  { key: 'spec', label: 'Спека', value: spec, color: '#14b8a6' }
+];
+
+const planPercent = total > 0 ? Math.round((done / total) * 100) : 0;
+---
+
+<article class={`diagram-card ${compact ? 'compact' : ''}`} data-diagram-card data-plan-value={planPercent}>
+  <div class="diagram-head">
+    <div>
+      <h3>{name}</h3>
+      <p>Итог {progress}% · Г {hologram}% · С {spec}%</p>
+    </div>
+    <div class="diagram-badge">интерактивно</div>
+  </div>
+
+  <div class="diagram-visual">
+    <svg viewBox="0 0 200 200" aria-hidden="true">
+      <circle class="diagram-track outer" cx="100" cy="100" r="76"></circle>
+      <circle
+        class="diagram-ring outer"
+        cx="100"
+        cy="100"
+        r="76"
+        data-diagram-plan-ring
+        style={`stroke:#0f172a; stroke-dasharray:${2 * Math.PI * 76}; stroke-dashoffset:${2 * Math.PI * 76 * (1 - planPercent / 100)};`}
+      ></circle>
+      <circle class="diagram-track inner" cx="100" cy="100" r="52"></circle>
+      <circle
+        class="diagram-ring inner"
+        cx="100"
+        cy="100"
+        r="52"
+        data-diagram-ring
+        style={`stroke:${parts[0].color}; stroke-dasharray:${2 * Math.PI * 52}; stroke-dashoffset:${2 * Math.PI * 52 * (1 - progress / 100)};`}
+      ></circle>
+      <circle class="diagram-glow" cx="100" cy="100" r="52"></circle>
+    </svg>
+
+    <div class="diagram-center">
+      <strong data-diagram-value>{progress}%</strong>
+      <span data-diagram-label>Итог</span>
+      <em>{done}/{total} объём · план {planPercent}%</em>
+    </div>
+  </div>
+
+  <div class="diagram-legend">
+    {parts.map((part) => (
+      <button type="button" class="diagram-button" data-diagram-button data-target={part.key} data-value={part.value}>
+        <span>{part.label}</span>
+        <strong>{part.value}%</strong>
+      </button>
+    ))}
+  </div>
+
+  {activityMonths.length > 0 && (
+    <div class="diagram-activity">
+      <div class="activity-title">Активность за 2 месяца</div>
+      {activityMonths.map((month) => (
+        <div class="activity-row" title={`${name}: ${month.label} — ${month.count} коммитов`}>
+          <span>{month.label}</span>
+          <div class="activity-track">
+            <i style={`width:${month.percent}%`}></i>
+          </div>
+          <strong>{month.count}</strong>
+        </div>
+      ))}
+    </div>
+  )}
+</article>
+
+<style>
+  .diagram-card {
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 20px;
+    background: color-mix(in oklab, var(--bg) 94%, var(--line) 6%);
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+  }
+  .diagram-card.compact { padding: 16px; border-radius: 20px; }
+  .diagram-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+  .diagram-head h3 { margin: 0; text-transform: uppercase; font-size: 1rem; letter-spacing: 0.04em; }
+  .diagram-head p { margin: 4px 0 0; color: var(--muted); }
+  .diagram-badge {
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .diagram-visual {
+    position: relative;
+    width: min(100%, 360px);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    display: grid;
+    place-items: center;
+  }
+  .diagram-visual svg { width: 100%; height: 100%; overflow: visible; }
+  .diagram-visual circle {
+    fill: none;
+    transform: rotate(-90deg);
+    transform-origin: 100px 100px;
+    stroke-linecap: round;
+  }
+  .diagram-track.outer { stroke: color-mix(in oklab, var(--line) 86%, transparent); opacity: 0.22; stroke-width: 16; }
+  .diagram-track.inner { stroke: color-mix(in oklab, var(--line) 74%, transparent); opacity: 0.18; stroke-width: 24; }
+  .diagram-ring.outer { stroke: #1e293b; stroke-width: 16; transition: stroke-dashoffset 180ms ease, stroke 180ms ease; }
+  .diagram-ring.inner { stroke-width: 24; transition: stroke-dashoffset 180ms ease, stroke 180ms ease, opacity 180ms ease, stroke-width 180ms ease; }
+  .diagram-glow { stroke: transparent; stroke-width: 34; opacity: 0.16; filter: blur(3px); }
+  .diagram-center {
+    position: absolute;
+    display: grid;
+    gap: 4px;
+    text-align: center;
+    pointer-events: none;
+  }
+  .diagram-center strong { font-size: 2.4rem; line-height: 1; }
+  .diagram-center strong { text-shadow: 0 0 0.5px rgba(255,255,255,0.4); }
+  .diagram-center span { color: var(--muted); text-transform: uppercase; font-size: 0.78rem; }
+  .diagram-center em { font-style: normal; color: var(--muted); font-size: 0.82rem; }
+  .diagram-legend { display: grid; gap: 8px; }
+  .diagram-legend::before {
+    content: 'Слой';
+    text-transform: uppercase;
+    color: var(--muted);
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+  }
+  .diagram-button {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+  }
+  .diagram-button.is-active { border-color: var(--text); background: rgba(255,255,255,0.03); }
+  .diagram-button.is-active strong { font-size: 1.05rem; }
+  .diagram-button span { color: var(--muted); text-transform: uppercase; font-size: 0.78rem; }
+  .diagram-button strong { font-size: 0.95rem; }
+  .diagram-activity { display: grid; gap: 10px; border-top: 1px solid var(--line-soft); padding-top: 12px; }
+  .activity-title { text-transform: uppercase; font-size: 0.76rem; color: var(--muted); letter-spacing: 0.08em; }
+  .activity-row { display: grid; grid-template-columns: 88px 1fr 32px; gap: 12px; align-items: center; }
+  .activity-row span { color: var(--muted); text-transform: uppercase; font-size: 0.78rem; }
+  .activity-track { height: 12px; border: 1px solid var(--line); overflow: hidden; }
+  .activity-track i { display: block; height: 100%; background: var(--text); }
+  .activity-row strong { text-align: right; }
+  @media (max-width: 640px) {
+    .diagram-head { flex-direction: column; }
+    .activity-row { grid-template-columns: 1fr; gap: 6px; }
+    .activity-row strong { text-align: left; }
+  }
+</style>
+
+<script>
+  const cards = document.querySelectorAll('[data-diagram-card]');
+  cards.forEach((card) => {
+    const valueEl = card.querySelector('[data-diagram-value]');
+    const labelEl = card.querySelector('[data-diagram-label]');
+    const ringEl = card.querySelector('[data-diagram-ring]');
+    const planRingEl = card.querySelector('[data-diagram-plan-ring]');
+    const buttons = card.querySelectorAll('[data-diagram-button]');
+
+    const planValue = Number(card.getAttribute('data-plan-value') || '0');
+
+    const activate = (button) => {
+      const value = Number(button.getAttribute('data-value') || '0');
+      const target = button.getAttribute('data-target');
+      const color = target === 'progress' ? '#2563eb' : target === 'hologram' ? '#8b5cf6' : '#14b8a6';
+      const radius = 52;
+      const circumference = 2 * Math.PI * radius;
+      const planRadius = 76;
+      const planCircumference = 2 * Math.PI * planRadius;
+      buttons.forEach((item) => item.classList.toggle('is-active', item === button));
+      if (valueEl) valueEl.textContent = `${value}%`;
+      if (labelEl) labelEl.textContent = target === 'progress' ? 'Итог' : target === 'hologram' ? 'Голограмма' : 'Спека';
+      if (planRingEl) {
+        planRingEl.setAttribute('style', `stroke:#0f172a; stroke-dasharray:${planCircumference}; stroke-dashoffset:${planCircumference * (1 - planValue / 100)};`);
+      }
+      if (ringEl) {
+        ringEl.setAttribute('style', `stroke:${color}; stroke-dasharray:${circumference}; stroke-dashoffset:${circumference * (1 - value / 100)};`);
+      }
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('mouseenter', () => activate(button));
+      button.addEventListener('focus', () => activate(button));
+      button.addEventListener('click', () => activate(button));
+    });
+
+    const firstButton = buttons.item(0);
+    if (firstButton) activate(firstButton);
+  });
+</script>

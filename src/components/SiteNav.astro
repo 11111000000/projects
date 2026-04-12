@@ -1,0 +1,33 @@
+---
+const { active } = Astro.props;
+---
+
+<nav class="nav">
+  <a class={active === 'home' ? 'active' : ''} href="/">Overview</a>
+  <a class={active === 'report' ? 'active' : ''} href="/report">Report</a>
+  <a class={active === 'uha-6-0' ? 'active' : ''} href="/projects/uha-6-0">UHA-6.0</a>
+  <a class={active === 'genius' ? 'active' : ''} href="/projects/genius">Genius</a>
+  <a class={active === 'methoda' ? 'active' : ''} href="/projects/methoda">MethodA</a>
+</nav>
+
+<style>
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0 0;
+  }
+  .nav a {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    text-decoration: none;
+    background: rgba(255,255,255,0.03);
+  }
+  .nav a.active {
+    color: var(--text);
+    border-color: rgba(138,208,255,0.35);
+    background: rgba(138,208,255,0.12);
+  }
+</style>

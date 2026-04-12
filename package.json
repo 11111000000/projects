@@ -1,0 +1,21 @@
+{
+  "name": "projects-review",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "dev:host": "astro dev --host 0.0.0.0",
+    "build": "astro build",
+    "preview": "astro preview",
+    "preview:host": "astro preview --host 0.0.0.0",
+    "start": "astro preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "astro": "^4.16.19",
+    "chart.js": "^4.5.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "playwright": "^1.59.1"
+  }
+}

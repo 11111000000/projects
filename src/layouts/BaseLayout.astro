@@ -1,0 +1,340 @@
+---
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%234f46e5'/><path d='M4 8h8M8 4v8' stroke='white' stroke-width='1.5' stroke-linecap='round'/></svg>" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fafafa;
+        --panel: #ffffff;
+        --line: #e5e5e5;
+        --line-soft: #f0f0f0;
+        --text: #1a1a1a;
+        --muted: #737373;
+        --accent: #404040;
+        --surface: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,250,0.92));
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+      }
+
+      body[data-theme='dark'] {
+        --bg: #141414;
+        --panel: #1c1c1c;
+        --line: #2a2a2a;
+        --line-soft: #222222;
+        --text: #e5e5e5;
+        --muted: #737373;
+        --accent: #a3a3a3;
+        --surface: linear-gradient(180deg, rgba(28,28,28,0.96), rgba(20,20,20,0.92));
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.5;
+        font-size: 16px;
+      }
+
+      .shell {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .topbar {
+        border-bottom: 2px solid var(--line);
+        padding-bottom: 16px;
+        margin-bottom: 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        min-height: 156px;
+      }
+
+      .theme-toggle {
+        padding: 8px 16px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        color: var(--text);
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        flex: 0 0 auto;
+      }
+
+      .topbar > :first-child {
+        min-width: 0;
+        max-width: 100%;
+        flex: 1 1 0;
+        display: grid;
+        align-content: center;
+        gap: 6px;
+        min-height: 156px;
+      }
+
+      .topbar :is(h1, .lead, .eyebrow) {
+        font-family: inherit;
+      }
+
+      .topbar h1 {
+        min-height: 3em;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 40px;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 24px;
+        border-right: 1px solid var(--line-soft);
+        padding-right: 24px;
+      }
+
+      .sidebar .nav a,
+      .sidebar .metric,
+      .content > section,
+      .panel,
+      .card,
+      .summary-article,
+      .research-card,
+      .diagram-card,
+      .confidence-card,
+      .summary-card,
+      .raw-card,
+      .wf-card,
+      .wf-action-card,
+      .commit-card,
+      .project-article {
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(8px);
+      }
+
+      h1, h2, h3 {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        letter-spacing: -0.03em;
+      }
+
+      p, li, a, span, div {
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      .content {
+        min-width: 0;
+      }
+
+      .brand {
+        margin-bottom: 32px;
+      }
+
+      .brand strong {
+        font-size: 1.4rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .dev-error-panel {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        width: min(460px, calc(100vw - 32px));
+        max-height: min(70vh, 640px);
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid #ef4444;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.96);
+        color: #fff;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        z-index: 9999;
+      }
+
+      .dev-error-panel.is-visible { display: flex; }
+      .dev-error-panel header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .dev-error-panel button {
+        border: 0;
+        background: rgba(255,255,255,0.1);
+        color: inherit;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font: inherit;
+        cursor: pointer;
+      }
+      .dev-error-list {
+        overflow: auto;
+        display: grid;
+        gap: 8px;
+      }
+      .dev-error-item {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.1);
+        font-size: 0.82rem;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .dev-error-meta {
+        font-size: 0.72rem;
+        color: rgba(255,255,255,0.72);
+        margin-top: 4px;
+      }
+
+      @media (max-width: 1100px) {
+        .layout { grid-template-columns: 1fr; }
+        .sidebar { position: static; border-right: none; border-bottom: 1px solid var(--line-soft); padding-right: 0; padding-bottom: 24px; }
+        .topbar { margin-bottom: 24px; }
+      }
+
+      @media (max-width: 640px) {
+        .topbar,
+        .topbar > :first-child { min-height: 0; }
+      }
+    </style>
+    <script>
+      if (import.meta.env.DEV) {
+        const KEY = '__projects_review_dev_errors__';
+
+        const readErrors = () => {
+          try { return JSON.parse(sessionStorage.getItem(KEY) || '[]'); } catch { return []; }
+        };
+
+        const writeErrors = (errors) => {
+          sessionStorage.setItem(KEY, JSON.stringify(errors.slice(-50)));
+        };
+
+        const pushError = (kind, message, meta = '') => {
+          const errors = readErrors();
+          errors.push({ kind, message, meta, time: new Date().toLocaleTimeString('ru-RU') });
+          writeErrors(errors);
+          render();
+        };
+
+        const render = () => {
+          let panel = document.querySelector('[data-dev-error-panel]');
+          if (!panel) {
+            panel = document.createElement('aside');
+            panel.className = 'dev-error-panel';
+            panel.setAttribute('data-dev-error-panel', '');
+            panel.innerHTML = `
+              <header>
+                <span>Dev Console Errors</span>
+                <button type="button" data-dev-error-clear>Clear</button>
+              </header>
+              <div class="dev-error-list" data-dev-error-list></div>
+            `;
+            document.body.appendChild(panel);
+            panel.querySelector('[data-dev-error-clear]')?.addEventListener('click', () => {
+              sessionStorage.removeItem(KEY);
+              render();
+            });
+          }
+
+          const errors = readErrors();
+          const list = panel.querySelector('[data-dev-error-list]');
+          if (list) {
+            list.innerHTML = errors.length
+              ? errors.map((entry) => `
+                <div class="dev-error-item">
+                  <div><strong>[${entry.kind}]</strong> ${entry.message}</div>
+                  ${entry.meta ? `<div class="dev-error-meta">${entry.meta}</div>` : ''}
+                  <div class="dev-error-meta">${entry.time}</div>
+                </div>
+              `).join('')
+              : '<div class="dev-error-item">Ошибок нет.</div>';
+          }
+          panel.classList.toggle('is-visible', errors.length > 0);
+        };
+
+        window.addEventListener('error', (event) => {
+          pushError('error', event.message || 'Unknown error', `${event.filename || 'unknown'}:${event.lineno || 0}:${event.colno || 0}`);
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+          pushError('promise', String(event.reason || 'Unhandled rejection'));
+        });
+
+        const originalError = console.error.bind(console);
+        console.error = (...args) => {
+          originalError(...args);
+          pushError('console.error', args.map((arg) => {
+            try { return typeof arg === 'string' ? arg : JSON.stringify(arg); } catch { return String(arg); }
+          }).join(' '));
+        };
+
+        document.addEventListener('DOMContentLoaded', render);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <slot name="topbar" />
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему">Тема: <strong data-theme-label>Тёмная</strong></button>
+      </div>
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="brand">
+            <strong>ProjectsReview</strong>
+            <span>Панель аналитики</span>
+          </div>
+          <slot name="sidebar" />
+        </aside>
+        <main class="content">
+          <slot />
+        </main>
+      </div>
+    </div>
+    <aside class="dev-error-panel" data-dev-error-panel></aside>
+    <script>
+      const root = document.body;
+      const toggle = document.querySelector('[data-theme-toggle]');
+      const label = document.querySelector('[data-theme-label]');
+      const storageKey = 'projects-review-theme';
+
+      const setTheme = (theme) => {
+        root.dataset.theme = theme;
+        if (label) label.textContent = theme === 'light' ? 'Светлая' : 'Тёмная';
+      };
+
+      setTheme(window.localStorage.getItem(storageKey) || 'light');
+
+      toggle?.addEventListener('click', () => {
+        const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+        window.localStorage.setItem(storageKey, next);
+        setTheme(next);
+      });
+    </script>
+  </body>
+</html>

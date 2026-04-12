@@ -1,0 +1,109 @@
+---
+// @ts-nocheck
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DashboardSidebar from '../components/DashboardSidebar.astro';
+import { loadProjectResearch } from '../lib/project-research.js';
+
+const research = await loadProjectResearch();
+const projects = research.projects;
+
+const projectSummaries = projects.map((project) => ({
+  name: project.name,
+  slug: project.slug,
+  status: project.status,
+  summary: project.summary,
+  unique: project.name === 'UHA-6.0'
+    ? 'Прототипная Android-основа с живыми границами и ещё незакрытым domain bridge.'
+    : project.name === 'Genius'
+      ? 'Графовый движок с сильной runtime-архитектурой и незавершённым product polish.'
+      : 'Docs-first контур, где канон и протоколы уже сильнее реализации.'
+}));
+---
+
+<BaseLayout title="ProjectsReview" description="Панель по проектам" >
+  <Fragment slot="topbar">
+    <div>
+      <div class="eyebrow">Проекты</div>
+      <h1>Сводка по трём проектам</h1>
+      <p class="lead">Краткий обзор статуса и текущих рисков.</p>
+    </div>
+  </Fragment>
+
+  <Fragment slot="sidebar">
+    <DashboardSidebar projects={projects} active="home" />
+  </Fragment>
+
+  <section class="hero-copy">
+    <p class="lead">
+      Это компактный обзор статуса, сделанного, планов и рисков по UHA-6.0, Genius и MethodA.
+    </p>
+    <div class="legend">
+      <span class="legend-item good">Завершено</span>
+      <span class="legend-item warn">В работе</span>
+      <span class="legend-item info">Документация</span>
+      <span class="legend-item danger">Риск</span>
+    </div>
+    <div class="hero-actions">
+      <a class="cta" href="/report">Открыть отчёт</a>
+      <a class="cta secondary" href="/research">Открыть исследование</a>
+    </div>
+  </section>
+
+  <section class="metrics">
+    {projects.map((project) => (
+      <article class="metric">
+        <strong>{project.name}</strong>
+        <span>Итог {project.progress}% · Голограмма {project.hologramProgress}% · Спека {project.specProgress}%</span>
+      </article>
+    ))}
+  </section>
+
+  <section class="cards">
+    {projects.map((project) => (
+      <article class="card">
+        <div class={`badge ${project.statusTone}`}>{project.status}</div>
+        <h2>{project.name}</h2>
+        <p>{project.summary}</p>
+        <ul class="micro-list">
+          {project.doneItems.slice(0, 2).map((item) => <li>{item}</li>)}
+        </ul>
+        <a href={`/projects/${project.slug}`}>Открыть проект</a>
+      </article>
+    ))}
+  </section>
+
+</BaseLayout>
+
+<style>
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; color: var(--muted); }
+  h1 { margin: 8px 0 0; font-size: clamp(2.2rem, 4vw, 3.5rem); max-width: 12ch; line-height: 0.98; font-family: inherit; }
+  .lead { margin: 8px 0 0; color: var(--muted); line-height: 1.7; font-size: 1.02rem; font-family: inherit; }
+  .hero-copy { margin-top: 8px; display: grid; gap: 8px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .legend-item { padding: 4px 10px; border: 1px solid var(--line); font-size: 0.78rem; text-transform: uppercase; }
+  .legend-item.good { color: #10b981; background: rgba(16,185,129,0.12); }
+  .legend-item.warn { color: #f59e0b; background: rgba(245,158,11,0.12); }
+  .legend-item.info { color: #3b82f6; background: rgba(59,130,246,0.12); }
+  .legend-item.danger { color: #ef4444; background: rgba(239,68,68,0.12); }
+  .cta { display: inline-flex; width: fit-content; color: var(--text); text-decoration: none; border: 1px solid var(--line); padding: 8px 12px; }
+  .cta.secondary { color: var(--muted); }
+  .metrics, .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  .metric, .card { border: 1px solid var(--line); padding: 14px; background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); }
+  .metric strong { display: block; font-size: 1.7rem; letter-spacing: -0.04em; font-family: inherit; }
+  .metric span, .card p { color: var(--muted); }
+  .card { display: grid; gap: 8px; }
+  .badge { display: inline-flex; width: fit-content; border: 1px solid var(--line); padding: 4px 8px; font-size: 0.8rem; }
+  .badge.good { color: #10b981; border-color: #10b981; background: rgba(16,185,129,0.12); }
+  .badge.warn { color: #f59e0b; border-color: #f59e0b; background: rgba(245,158,11,0.12); }
+  .badge.info { color: #3b82f6; border-color: #3b82f6; background: rgba(59,130,246,0.12); }
+  .badge.danger { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.12); }
+  .micro-list { margin: 0; padding-left: 18px; color: var(--muted); display: grid; gap: 4px; }
+  .card a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--line); width: fit-content; }
+  @media (max-width: 980px) {
+    .metrics, .cards { grid-template-columns: 1fr; }
+    h1 { max-width: none; font-size: clamp(1.9rem, 9vw, 3rem); }
+    .lead { font-size: 0.98rem; }
+    .metric strong { font-size: 1.45rem; }
+  }
+</style>
