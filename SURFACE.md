@@ -15,7 +15,12 @@
 - Name: GitHubPagesDeployment.v1
   Stability: [FROZEN]
   Spec: `.github/workflows/deploy.yml` builds and deploys to GitHub Pages on push to main.
-  Proof: Push to main → Actions run → site available at `*.github.io`
+  Proof: Push to main → Actions run → then enable Settings → Pages → Source = GitHub Actions. Verify with `curl -I https://11111000000.github.io/projects/` returning `200`.
+
+- Name: ContentUpdatePipeline.v1
+  Stability: [FROZEN]
+  Spec: `docs/content-update-pipeline.md` defines the source-of-truth order, dialectical reconciliation rule, update loop, and verification steps for project facts.
+  Proof: Update source repo docs first, then `src/lib/catalog.js`, `src/lib/project-research.js`, and the public pages; verify with `npm run build`.
 
 - Name: ProjectsReviewStatic.v1
   Stability: [FROZEN]

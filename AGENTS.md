@@ -45,6 +45,27 @@ When tunnel is running:
 2. Push code: `git push origin main`
 3. Enable: Settings → Pages → Source → GitHub Actions
 
+## Content Update Pipeline
+
+Use `docs/content-update-pipeline.md` as the operating spec for updating project information on the site.
+
+Minimum loop:
+1. Identify changed facts in the source repos.
+2. Update source docs first, then update this site’s catalog and extracted summaries.
+3. Run `npm run build` and verify the public pages render the new facts.
+4. If the change is user-visible, update the relevant project article and the report/research pages together.
+5. If sources disagree, preserve the contradiction in the research layer instead of forcing a false certainty.
+
+## How To Verify The Site
+
+1. Open the Pages URL from the repository settings after the workflow succeeds.
+2. Check the `Actions` tab for a green `Deploy to GitHub Pages` run.
+3. Confirm the deployed URL returns `200` in the browser or with:
+```bash
+curl -I https://11111000000.github.io/projects/
+```
+4. If you only see `404`, GitHub Pages is not enabled yet or the wrong source is selected.
+
 ## Scripts
 
 ### e2e-check.cjs

@@ -281,14 +281,11 @@ const projectSummaries = projects.map((project) => ({
 
 <BaseLayout title="Отчёт по проектам" description="Диалектический отчёт по проектам" active="report">
   <Fragment slot="topbar">
-    <div>
-      <div class="eyebrow">Отчёт</div>
-      <h1>Сбор данных, анализ, публикация</h1>
-      <p class="lead">
-        Сначала фиксируются данные по каждому проекту, затем строится анализ, и только после этого
-        формируется панель.
-      </p>
-    </div>
+      <div>
+        <div class="eyebrow">Отчёт</div>
+        <h1>Сбор данных, анализ, публикация</h1>
+      <p class="lead">Сводка по проектам, где каждый блок показывает только новый смысл.</p>
+      </div>
   </Fragment>
 
   <Fragment slot="sidebar">
@@ -326,7 +323,7 @@ const projectSummaries = projects.map((project) => ({
 
     <div class="llm-optimization-note">
       <div class="opt-badge success">Апрель: Budget+Mid = {llmData.tierApr.budget + llmData.tierApr.mid}%</div>
-      <span>Эффективность: стоимость запроса упала до {llmData.aprCpr} ₽ (было 17.28 ₽).</span>
+      <span>Стоимость запроса: {llmData.aprCpr} ₽.</span>
     </div>
   </section>
 
@@ -1106,29 +1103,10 @@ const projectSummaries = projects.map((project) => ({
             <span>{row.volumeDone}/{row.volumeTotal}</span>
           </div>
           <div class="plan-card-tasks">
-            <strong>Ближайшие шаги:</strong>
             <ul>
               {row.next.slice(0, 3).map((item) => <li>{item}</li>)}
             </ul>
           </div>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <section class="stage plan-strip">
-    <header>
-      <span class="step-num">06</span>
-      <h2>Реальный план по проектам</h2>
-    </header>
-    <div class="commit-grid">
-      {projects.map((project) => (
-        <article class="commit-card">
-          <h3>{project.name}</h3>
-          <p class="commit-note">{project.scoreNote}</p>
-          <ul>
-            {project.nextItems.slice(0, 4).map((item) => <li>{item}</li>)}
-          </ul>
         </article>
       ))}
     </div>
@@ -1954,7 +1932,6 @@ const projectSummaries = projects.map((project) => ({
   .plan-progress-bar i { display: block; height: 100%; background: var(--text); }
   .plan-card-progress span { font-size: 0.8rem; color: var(--muted); }
   .plan-card-tasks { display: grid; gap: 6px; }
-  .plan-card-tasks strong { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; }
   .plan-card-tasks ul { margin: 0; padding-left: 16px; display: grid; gap: 4px; font-size: 0.85rem; }
   .plan-strip ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
 
