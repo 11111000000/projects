@@ -48,6 +48,7 @@ function buildTwoMonthActivity(commitDetails = []) {
 }
 
 const projectMonths = buildTwoMonthActivity(resolvedProject.commitDetails || []);
+const recentActivity = buildTwoMonthActivity(resolvedProject.commitDetails || []);
 const projectMax = Math.max(...projectMonths.map((month) => month.count), 1);
 const projectActivityMonths = projectMonths.map((month) => ({
   ...month,
@@ -108,6 +109,7 @@ const article = resolvedProject.article || {
       total={resolvedProject.totalVolume}
       commitDetails={resolvedProject.commitDetails || []}
       gantt={resolvedProject.gantt || []}
+      recentActivity={recentActivity}
       compact={true}
     />
   </section>
@@ -157,8 +159,8 @@ const article = resolvedProject.article || {
 
   <section class="panel hologram-panel">
     <h2>Архитектурный слой</h2>
-    <p class="holo-state">{resolvedProject.hologramState}</p>
-    <p class="holo-summary">{resolvedProject.hologramSummary}</p>
+          <p class="holo-state">{resolvedProject.hologramState}</p>
+          <p class="holo-summary">{resolvedProject.hologramSummary}</p>
       <div class="holo-grid">
         <div>
         <strong>Документы</strong>

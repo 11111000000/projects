@@ -8,6 +8,7 @@ const {
   total = 0,
   commitDetails = [],
   gantt = [],
+  recentActivity = [],
   compact = false
 } = Astro.props;
 
@@ -70,6 +71,8 @@ const sparkPoints = cumulativePoints.map((point, index) => {
   return `${x},${y}`;
 });
 const sparkPath = sparkPoints.length ? `M ${sparkPoints.join(' L ')}` : '';
+
+const recentActivityMax = Math.max(1, ...recentActivity.map((day) => day.count || 0));
 
 function ganttLeft(start) {
   return `${Math.max(0, (Math.min(8, start) - 1) / 8) * 100}%`;
@@ -161,6 +164,21 @@ function ganttWidth(span) {
     </article>
   </section>
 
+  {recentActivity.length > 0 ? (
+    <section class="activity-section">
+      <h4>Точная активность за 14 дней</h4>
+      <div class="activity-bars">
+        {recentActivity.map((day) => (
+          <div class="activity-bar-row">
+            <span>{day.label}</span>
+            <div class="activity-bar"><i style={`width:${Math.max(4, Math.round((day.count / recentActivityMax) * 100))}%;`}></i></div>
+            <strong>{day.count}</strong>
+          </div>
+        ))}
+      </div>
+    </section>
+  ) : null}
+
   <section class="gantt-section">
     <h4>Мини-гант</h4>
     <div class="gantt-list">
@@ -223,6 +241,13 @@ function ganttWidth(span) {
   .stacked-row { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px; align-items: center; }
   .stacked-row span { font-size: 0.78rem; text-transform: uppercase; }
   .gantt-list { display: grid; gap: 8px; }
+  .activity-section { border: 1px solid var(--line); padding: 14px; min-width: 0; }
+  .activity-section h4 { margin: 0 0 10px; }
+  .activity-bars { display: grid; gap: 8px; }
+  .activity-bar-row { display: grid; grid-template-columns: 84px 1fr 32px; gap: 10px; align-items: center; }
+  .activity-bar-row span { font-size: 0.72rem; text-transform: uppercase; color: var(--muted); }
+  .activity-bar { height: 10px; border: 1px solid var(--line); overflow: hidden; background: transparent; }
+  .activity-bar i { display: block; height: 100%; background: #2563eb; }
   .gantt-row { display: grid; grid-template-columns: 128px 1fr; gap: 12px; align-items: center; }
   .gantt-labels strong { display: block; font-size: 0.86rem; }
   .gantt-labels span { font-size: 0.72rem; text-transform: uppercase; }
@@ -236,6 +261,6 @@ function ganttWidth(span) {
     .summary-tile.wide { grid-column: auto; }
     .health-head { flex-direction: column; }
     .health-kpi { text-align: left; }
-    .gantt-row, .stacked-row { grid-template-columns: 1fr; }
+    .gantt-row, .stacked-row, .activity-bar-row { grid-template-columns: 1fr; }
   }
 </style>

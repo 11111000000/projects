@@ -4,10 +4,46 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import DashboardSidebar from '../components/DashboardSidebar.astro';
 import ProjectHealthDashboard from '../components/ProjectHealthDashboard.astro';
 import { loadProjectResearch } from '../lib/project-research.js';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 const research = await loadProjectResearch();
 const projects = research.projects;
 const totals = research.totals;
+
+const statsCsv = await fs.readFile(path.resolve(process.cwd(), 'stats-2026-04-12.csv'), 'utf8');
+const statsLines = statsCsv.trim().split(/\r?\n/);
+const statsHeader = statsLines[0].split(',');
+const statsRows = statsLines.slice(1).map((line) => {
+  const cols = line.split(',');
+  return {
+    timestamp: cols[statsHeader.indexOf('Timestamp')],
+    model: cols[statsHeader.indexOf('Model')],
+    cost: Number(cols[statsHeader.indexOf('Cost')] || '0')
+  };
+});
+
+const modelUsageMap = new Map();
+const activityMap = new Map();
+for (const row of statsRows) {
+  modelUsageMap.set(row.model, (modelUsageMap.get(row.model) || 0) + 1);
+  const day = row.timestamp.slice(0, 10);
+  activityMap.set(day, (activityMap.get(day) || 0) + 1);
+}
+
+const modelUsageRows = [...modelUsageMap.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 12)
+  .map(([model, count]) => ({ model, count }));
+
+const last14Days = [...activityMap.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-14);
+const last14Max = Math.max(1, ...last14Days.map(([, count]) => count));
+const last14Rows = last14Days.map(([date, count]) => ({
+  date,
+  label: new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' }).format(new Date(`${date}T00:00:00Z`)),
+  count,
+  percent: Math.round((count / last14Max) * 100)
+}));
 
 const modelColors = {
   'gpt-5.4': '#52525b', 'gpt-5.4-pro': '#52525b', 'gpt-5.4-20260305': '#52525b',
@@ -73,7 +109,6 @@ const llmData = {
   topModels: llmTopModels
 };
 const llmMonthMax = Math.max(...llmData.months.map((month) => month.total));
-const llmTopMax = Math.max(...llmTopModels.map((model) => model.cost));
 const progressSummary = projects.map((project) => ({
   name: project.name,
   progress: project.progress,
@@ -324,6 +359,42 @@ const projectSummaries = projects.map((project) => ({
     <div class="llm-optimization-note">
       <div class="opt-badge success">Апрель: Budget+Mid = {llmData.tierApr.budget + llmData.tierApr.mid}%</div>
       <span>Стоимость запроса: {llmData.aprCpr} ₽.</span>
+    </div>
+  </section>
+
+  <section class="stage model-usage-stage">
+    <header>
+      <span class="step-num">01b</span>
+      <h2>Используемые модели</h2>
+    </header>
+    <div class="model-usage-grid">
+      {modelUsageRows.map((row) => {
+        const maxCount = Math.max(...modelUsageRows.map((item) => item.count), 1);
+        return (
+          <div class="model-usage-row">
+            <span>{row.model}</span>
+            <div class="model-usage-bar"><i style={`width:${Math.round((row.count / maxCount) * 100)}%`}></i></div>
+            <strong>{row.count}</strong>
+          </div>
+        );
+      })}
+    </div>
+    <p class="model-usage-summary">Показывает, какие модели реально использовались в `stats-2026-04-12.csv`.</p>
+  </section>
+
+  <section class="stage activity-stage">
+    <header>
+      <span class="step-num">01c</span>
+      <h2>Активность за последние 14 дней</h2>
+    </header>
+    <div class="last14-grid">
+      {last14Rows.map((row) => (
+        <div class="last14-row">
+          <span>{row.label}</span>
+          <div class="last14-bar"><i style={`width:${row.percent}%`}></i></div>
+          <strong>{row.count}</strong>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -853,20 +924,10 @@ const projectSummaries = projects.map((project) => ({
     </div>
   </section>
 
-  <section class="stage chart-stage">
-    <header>
-      <span class="step-num">02</span>
-      <h2>Прогресс по слоям</h2>
-    </header>
-    <div class="donut-grid">
-      {donutRows.map((row, index) => <ProjectHealthDashboard name={row.name} progress={row.progress} hologram={row.hologram} spec={row.spec} done={row.done} total={row.total} commitDetails={projects[index]?.commitDetails || []} gantt={projects[index]?.gantt || []} compact={false} />)}
-    </div>
-  </section>
-
   <section class="stage activity-stage">
     <header>
       <span class="step-num">03</span>
-      <h2>Ритм разработки (коммит-волны)</h2>
+      <h2>Ритм разработки</h2>
     </header>
     <div class="commit-wave-shell">
       <div class="commit-wave-chart" data-commit-wave={JSON.stringify(commitWaveChart)}>
@@ -885,6 +946,38 @@ const projectSummaries = projects.map((project) => ({
           </article>
         ))}
       </div>
+    </div>
+  </section>
+
+  <section class="stage model-usage-stage">
+    <header>
+      <span class="step-num">03b</span>
+      <h2>Используемые модели</h2>
+    </header>
+    <div class="model-usage-grid">
+      {modelUsageRows.map((row) => (
+        <div class="model-usage-row">
+          <span>{row.model}</span>
+          <div class="model-usage-bar"><i style={`width:${Math.round((row.count / Math.max(...modelUsageRows.map((item) => item.count), 1)) * 100)}%`}></i></div>
+          <strong>{row.count}</strong>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="stage activity-14-stage">
+    <header>
+      <span class="step-num">03c</span>
+      <h2>Точная активность за 14 дней</h2>
+    </header>
+    <div class="last14-grid">
+      {last14Rows.map((row) => (
+        <div class="last14-row">
+          <span>{row.label}</span>
+          <div class="last14-bar"><i style={`width:${row.percent}%`}></i></div>
+          <strong>{row.count}</strong>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -1467,6 +1560,37 @@ const projectSummaries = projects.map((project) => ({
     background: rgba(16,185,129,0.15);
     color: #10b981;
   }
+
+  .model-usage-grid,
+  .last14-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .model-usage-row,
+  .last14-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 42px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .model-usage-bar,
+  .last14-bar {
+    height: 10px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    background: rgba(148,163,184,0.08);
+  }
+
+  .model-usage-bar i,
+  .last14-bar i {
+    display: block;
+    height: 100%;
+    background: #2563eb;
+  }
+
+  .model-usage-summary { color: var(--muted); }
 
   .llm-chart-card-wide canvas {
     height: 400px !important;

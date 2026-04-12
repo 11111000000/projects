@@ -70,6 +70,10 @@ const projectSummaries = projects.map((project) => ({
         total={project.totalVolume}
         commitDetails={project.commitDetails || []}
         gantt={project.gantt || []}
+        recentActivity={(project.commitDetails || []).slice(-14).map((commit) => ({
+          label: new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: 'short' }).format(new Date(`${commit.date}T00:00:00Z`)),
+          count: 1
+        }))}
         compact={true}
       />
     ))}
