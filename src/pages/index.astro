@@ -30,6 +30,10 @@ const projectSummaries = projects.map((project) => ({
     </div>
   </Fragment>
 
+  <script is:inline>
+    console.log(`[ProjectsReview] Build: ${new Date().toISOString()}`);
+  </script>
+
   <Fragment slot="sidebar">
     <DashboardSidebar projects={projects} active="home" />
   </Fragment>
