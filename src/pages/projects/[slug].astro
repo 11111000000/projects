@@ -112,23 +112,27 @@ const article = resolvedProject.article || {
   </section>
 
   <section class="panel project-article-panel">
-    <h2>Сводная статья</h2>
+    <h2>Статья о проекте</h2>
     <p>{article.lead}</p>
+    <p>{article.philosophy}</p>
     <p>{article.purpose}</p>
+    <p>{article.structure}</p>
+    <p>{article.device}</p>
     <div class="article-grid">
       <article>
-        <strong>Как сделано</strong>
+        <strong>Что построено</strong>
         <ul>{article.built.map((item) => <li>{item}</li>)}</ul>
+      </article>
+      <article>
+        <strong>Что важно удержать</strong>
+        <ul>{(article.tasks || article.next || []).map((item) => <li>{item}</li>)}</ul>
       </article>
       <article>
         <strong>Что уже сделано</strong>
         <ul>{article.done.map((item) => <li>{item}</li>)}</ul>
       </article>
-      <article>
-        <strong>Что запланировано</strong>
-        <ul>{article.next.map((item) => <li>{item}</li>)}</ul>
-      </article>
     </div>
+    <p>{article.tradeoffs}</p>
     <p class="article-assessment">{article.assessment}</p>
   </section>
 
@@ -141,12 +145,12 @@ const article = resolvedProject.article || {
   </section>
 
   <section class="panel hologram-panel">
-    <h2>Состояние Голограммы</h2>
+    <h2>Архитектурный слой</h2>
     <p class="holo-state">{resolvedProject.hologramState}</p>
     <p class="holo-summary">{resolvedProject.hologramSummary}</p>
       <div class="holo-grid">
         <div>
-        <strong>Голограмма</strong>
+        <strong>Документы</strong>
         <p>{resolvedProject.hologramState}</p>
         </div>
         <div>
@@ -156,11 +160,11 @@ const article = resolvedProject.article || {
       </div>
       <div class="holo-grid lower">
         <div>
-          <strong>Starter</strong>
+          <strong>Ядро</strong>
           <p>{resolvedProject.starterState}</p>
         </div>
         <div>
-          <strong>Формула</strong>
+          <strong>Формула зрелости</strong>
           <p>{resolvedProject.progressModel ? `Г ${resolvedProject.progressModel.hologramDone}/${resolvedProject.progressModel.hologramTotal}, С ${resolvedProject.progressModel.specDone}/${resolvedProject.progressModel.specTotal}` : 'нет данных'}</p>
         </div>
       </div>
@@ -200,7 +204,7 @@ const article = resolvedProject.article || {
   </section>
 
   <section class="panel timeline-panel">
-    <h2>Линейка этапов</h2>
+    <h2>Этапы и переходы</h2>
     <div class="timeline-grid">
       {resolvedProject.timeline.map((label, index) => {
         let statusText = 'ОЖИДАНИЕ';

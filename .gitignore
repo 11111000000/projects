@@ -1,1 +1,14 @@
 /.agent-shell/
+
+# Generated artifacts
+/.astro/
+/dist/
+/.context/
+/.build.log
+/.dev.log
+/node_modules/
+/stats-*.csv
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

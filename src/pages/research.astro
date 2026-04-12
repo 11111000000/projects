@@ -156,6 +156,7 @@ const sections = [
           <h3>{project.name}</h3>
           <p class="project-summary-note">{project.summary}</p>
           <p>{project.article?.lead}</p>
+          <p>{project.article?.philosophy}</p>
           <ul>
             {(project.article?.built || []).slice(0, 3).map((item) => <li>{item}</li>)}
           </ul>
