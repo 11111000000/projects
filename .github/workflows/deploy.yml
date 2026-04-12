@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [gh-pages]
 
 permissions:
   contents: read
@@ -48,3 +48,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Print deployment status
+        run: |
+          echo "Deployment ID: ${{ steps.deployment.outputs.deployment_id }}"
+          echo "Deployment status: ${{ steps.deployment.outputs.status }}"
