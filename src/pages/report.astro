@@ -5,6 +5,7 @@ import DashboardSidebar from '../components/DashboardSidebar.astro';
 import ProjectHealthDashboard from '../components/ProjectHealthDashboard.astro';
 import { loadProjectResearch } from '../lib/project-research.js';
 import { loadStatsCsv } from '../lib/stats-csv.js';
+import { siteHref } from '../lib/url.js';
 
 const research = await loadProjectResearch();
 const projects = research.projects;
@@ -1053,7 +1054,7 @@ const projectSummaries = projects.map((project) => ({
         <article class="summary-card">
           <strong>{project.name}</strong>
           <span>{project.progress}% · {project.totalDone}/{project.totalVolume}</span>
-          <a href={`/projects/${project.slug}`}>Открыть диаграмму проекта</a>
+          <a href={siteHref(`/${project.slug}`)}>Открыть диаграмму проекта</a>
         </article>
       ))}
     </div>
@@ -1234,7 +1235,7 @@ const projectSummaries = projects.map((project) => ({
           <h3>{project.name}</h3>
           <p>{project.summary}</p>
           <p class="summary-unique">{project.unique}</p>
-          <a href={`/projects/${project.slug}`}>Открыть проект</a>
+          <a href={siteHref(`/${project.slug}`)}>Открыть проект</a>
         </article>
       ))}
     </div>

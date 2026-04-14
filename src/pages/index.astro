@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import DashboardSidebar from '../components/DashboardSidebar.astro';
 import { loadProjectResearch } from '../lib/project-research.js';
 import ProjectHealthDashboard from '../components/ProjectHealthDashboard.astro';
+import { siteHref } from '../lib/url.js';
 
 const research = await loadProjectResearch();
 const projects = research.projects;
@@ -49,8 +50,8 @@ const projectSummaries = projects.map((project) => ({
       <span class="legend-item danger">Риск</span>
     </div>
     <div class="hero-actions">
-      <a class="cta" href="/report">Открыть отчёт</a>
-      <a class="cta secondary" href="/research">Открыть исследование</a>
+      <a class="cta" href={siteHref('/report')}>Открыть отчёт</a>
+      <a class="cta secondary" href={siteHref('/research')}>Открыть исследование</a>
     </div>
   </section>
 
@@ -92,7 +93,7 @@ const projectSummaries = projects.map((project) => ({
         <ul class="micro-list">
           {project.doneItems.slice(0, 2).map((item) => <li>{item}</li>)}
         </ul>
-        <a href={`/projects/${project.slug}`}>Открыть проект</a>
+        <a href={siteHref(`/${project.slug}`)}>Открыть проект</a>
       </article>
     ))}
   </section>

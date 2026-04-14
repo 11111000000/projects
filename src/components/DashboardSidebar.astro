@@ -1,15 +1,16 @@
 ---
 const { projects, active } = Astro.props;
+import { siteHref } from '../lib/url.js';
 ---
 
 <div>
   <nav class="nav">
-    <a class={active === 'home' ? 'active' : ''} href="/">Обзор</a>
-    <a class={active === 'report' ? 'active' : ''} href="/report">Отчёт</a>
-    <a class={active === 'research' ? 'active' : ''} href="/research">Исследование</a>
-    <a class={active === 'uha-6-0' ? 'active' : ''} href="/projects/uha-6-0">UHA-6.0</a>
-    <a class={active === 'genius' ? 'active' : ''} href="/projects/genius">Genius</a>
-    <a class={active === 'methoda' ? 'active' : ''} href="/projects/methoda">MethodA</a>
+    <a class={active === 'home' ? 'active' : ''} href={siteHref('/')}>Обзор</a>
+    <a class={active === 'report' ? 'active' : ''} href={siteHref('/report')}>Отчёт</a>
+    <a class={active === 'research' ? 'active' : ''} href={siteHref('/research')}>Исследование</a>
+    <a class={active === 'uha-6-0' ? 'active' : ''} href={siteHref('/uha-6-0')}>UHA-6.0</a>
+    <a class={active === 'genius' ? 'active' : ''} href={siteHref('/genius')}>Genius</a>
+    <a class={active === 'methoda' ? 'active' : ''} href={siteHref('/methoda')}>MethodA</a>
   </nav>
 
   <div class="metrics">

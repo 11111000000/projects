@@ -3,7 +3,18 @@ import path from 'node:path';
 
 export async function loadStatsCsv(filename = 'stats-2026-04-12.csv') {
   const csvPath = path.resolve(process.cwd(), filename);
-  const statsCsv = await fs.readFile(csvPath, 'utf8');
+  let statsCsv;
+
+  try {
+    statsCsv = await fs.readFile(csvPath, 'utf8');
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      return { modelUsageRows: [], last14Rows: [] };
+    }
+
+    throw error;
+  }
+
   const statsLines = statsCsv.trim().split(/\r?\n/);
   const statsHeader = statsLines[0].split(',');
   const statsRows = statsLines.slice(1).map((line) => {

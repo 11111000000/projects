@@ -1,10 +1,10 @@
 ---
 // @ts-nocheck
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import DashboardSidebar from '../../components/DashboardSidebar.astro';
-import ProjectHealthDashboard from '../../components/ProjectHealthDashboard.astro';
-import { loadProjectResearch } from '../../lib/project-research.js';
-import { catalog } from '../../lib/catalog.js';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DashboardSidebar from '../components/DashboardSidebar.astro';
+import ProjectHealthDashboard from '../components/ProjectHealthDashboard.astro';
+import { loadProjectResearch } from '../lib/project-research.js';
+import { catalog } from '../lib/catalog.js';
 
 export function getStaticPaths() {
   return catalog.map((project) => ({ params: { slug: project.slug }, props: { project } }));

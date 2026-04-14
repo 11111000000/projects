@@ -3,6 +3,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DashboardSidebar from '../components/DashboardSidebar.astro';
 import { loadProjectResearch } from '../lib/project-research.js';
+import { siteHref } from '../lib/url.js';
 
 const research = await loadProjectResearch();
 const projects = research.projects;
@@ -160,7 +161,7 @@ const sections = [
           <ul>
             {(project.article?.built || []).slice(0, 3).map((item) => <li>{item}</li>)}
           </ul>
-          <a href={`/projects/${project.slug}`}>Открыть подробную статью</a>
+          <a href={siteHref(`/${project.slug}`)}>Открыть подробную статью</a>
           <p class="article-caption">{project.article?.assessment}</p>
         </article>
       ))}
