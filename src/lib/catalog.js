@@ -51,10 +51,22 @@ const uhaCommits = [
 
 const geniusCommits = [
   {
-    hash: '2311218',
-    date: '2026-04-11',
-    title: 'обновление',
-    description: 'Текущая точка синхронизации после серии правок раскладки и сцены.'
+    hash: 'd9f7448',
+    date: '2026-04-14',
+    title: 'docs: update rotation and label specs',
+    description: 'Обновлены спецификации поворота и подписей после правок раскладки и селекции.'
+  },
+  {
+    hash: '085c534',
+    date: '2026-04-14',
+    title: 'feat: refine person card selection layout',
+    description: 'Уточнён макет карточки выбора человека, чтобы selection flow читался стабильнее.'
+  },
+  {
+    hash: '5285782',
+    date: '2026-04-14',
+    title: 'fix: stabilize person label collisions',
+    description: 'Стабилизированы коллизии подписей, чтобы подписи не пересекались в плотных сценах.'
   },
   {
     hash: 'ded18f3',
@@ -116,91 +128,91 @@ const methodaCommits = [
   {
     hash: '1dbd86a',
     date: '2026-04-09',
-    title: 'включить OpenRouter в конфигурации по умолчанию',
-    description: 'В конфигурацию по умолчанию добавлен OpenRouter как основной поставщик.'
+    title: 'Enable OpenRouter in default config',
+    description: 'OpenRouter включён в конфигурацию по умолчанию как основной провайдер.'
   },
   {
     hash: '05ebc54',
     date: '2026-04-09',
-    title: 'читать ключи API из ~/.authinfo',
-    description: 'Ключи API теперь читаются через auth-source из ~/.authinfo.'
+    title: 'MethodA: Read API keys from ~/.authinfo via auth-source',
+    description: 'Ключи API читаются через auth-source из ~/.authinfo для безопасной конфигурации.'
   },
   {
     hash: 'e0d9875',
     date: '2026-04-09',
-    title: 'использовать ~/.methoda/methoda.conf',
-    description: 'Песочница проверки переключена на ~/.methoda/methoda.conf.'
+    title: 'MethodA: Use ~/.methoda/methoda.conf in test playground',
+    description: 'Тестовая песочница теперь использует ~/.methoda/methoda.conf как локальный конфиг.'
   },
   {
     hash: 'e58c23b',
     date: '2026-04-09',
-    title: 'исполнитель end-to-end для песочницы',
-    description: 'Добавлен исполнитель end-to-end с сессиями и свободными моделями для песочницы.'
+    title: 'MethodA: Test Playground — E2E runner with sessions and free models',
+    description: 'Добавлен E2E runner с сессиями и free models для тестовой песочницы.'
   },
   {
     hash: 'f07952f',
     date: '2026-04-09',
-    title: 'завершение M8',
-    description: 'Закрыт этап M8: Method Profile оформлен как исполняемый пакет.'
+    title: 'MethodA: M8 complete — Method Profile as Package',
+    description: 'Этап M8 закрыт: Method Profile оформлен как исполняемый пакет.'
   },
   {
     hash: '6480b51',
     date: '2026-04-09',
-    title: 'завершение M1–M5 и M7',
-    description: 'Закрыта большая часть вех: живой документ, ревью, политика, тесты и агент.'
+    title: 'MethodA: M1-M5, M7 complete — Living Document, Review, Policy, Tests, Agent',
+    description: 'Закрыта основа MethodA: living document, review, policy, tests и agent слой.'
   },
   {
     hash: '3ad0083',
     date: '2026-04-08',
-    title: 'обновление HOLO.md и SURFACE.md',
-    description: 'Обновлены HOLO.md и SURFACE.md, зафиксированы этап живого документа и протокол действий.'
+    title: 'Update HOLO.md and SURFACE.md: Living Document, Action Protocol stage',
+    description: 'HOLO.md и SURFACE.md обновлены для стадии living document и action protocol.'
   },
   {
     hash: '0b5eaa7',
     date: '2026-04-08',
-    title: 'единый план, живой документ и протокол действий',
-    description: 'Собран единый план и синхронизированы живой документ и протокол действий.'
+    title: 'MethodA: единый план, living document, action protocol',
+    description: 'Собран единый план и синхронизированы living document и action protocol.'
   },
   {
     hash: '8f9df7a',
     date: '2026-04-08',
-    title: 'перевести планы на русский',
+    title: 'Перевод планов на русский язык',
     description: 'Планы переведены на русский язык для единообразия канона.'
   },
   {
     hash: 'ed2c66f',
     date: '2026-04-08',
-    title: 'удалить 1-plan.md',
-    description: 'Старый план 1 удалён и заменён консолидированным набором планов.'
+    title: 'Remove 1-plan.md and consolidate into plan-3',
+    description: 'Старый plan-1 удалён, контур консолидирован в plan-3.'
   },
   {
     hash: 'e211cc5',
     date: '2026-04-08',
-    title: 'консолидированный план живого документа',
-    description: 'Plan-3 собрал предыдущие планы в единый контур живого документа.'
+    title: 'Plan-3: Consolidated Living Document Plan; merge Plan 1/Plan 2 into Plan-3; add living-document core; deprecate old plans; include machine-readable manifest',
+    description: 'Консолидирован living document plan с манифестом и deprecation старых планов.'
   },
   {
     hash: '84d8bf7',
     date: '2026-04-08',
-    title: 'консолидированный план живого документа',
-    description: 'Уточнён единый слой плана с выводом старых артефактов из употребления.'
+    title: 'Plan-3: Consolidated Living Document Plan; introduce unified Plan-3; add living-document core; mark Plan-1 as deprecated; add machine-readable manifest',
+    description: 'Уточнён unified Plan-3 и добавлен machine-readable manifest.'
   },
   {
     hash: 'f9b5ed9',
     date: '2026-04-06',
-    title: 'агент сессий внутри документа',
-    description: 'Собрана первая реализация агента сессий внутри документа в режиме Emacs.'
+    title: 'feat: consolidate MethodA implementation as first document-native session agent in Emacs mode',
+    description: 'Собрана первая реализация document-native session agent в Emacs mode.'
   },
   {
     hash: '4a203f1',
     date: '2026-04-06',
-    title: 'добавить Nix-среду разработки для Emacs',
+    title: 'Add nix dev environment for Emacs',
     description: 'Добавлена Nix-среда разработки для Emacs, чтобы контур был воспроизводимым.'
   },
   {
     hash: '107ebc3',
     date: '2026-04-05',
-    title: 'начальное состояние',
+    title: 'initial',
     description: 'Старт проекта и первый рабочий след MethodA.'
   }
 ];
@@ -362,7 +374,7 @@ export const catalog = [
         'Есть GraphState, LayoutEngine, Three.js runtime и playground host.',
         'Поддерживаются phylogeny и generic-tree профили, а также forest layout с дефолтами.',
         'Реализован adaptive collision-free layout и плавный поворот веток без пересечений.',
-        'Покрытие тестами уже даёт устойчивую базу для дальнейшего рефакторинга.'
+        'Уточнены rotation/label specs и selection card flow для более стабильного UX.'
       ],
       tasks: [
         'Разбить монолитный layout на модули без потери поведения и тестового покрытия.',
@@ -374,7 +386,8 @@ export const catalog = [
       done: [
         'Движок и визуальный runtime готовы и работают.',
         'Есть 60+ тестов и поддержка профилей для разных типов графов.',
-        'Playground и базовый editor flow уже позволяют демонстрировать продукт.'
+        'Playground и базовый editor flow уже позволяют демонстрировать продукт.',
+        'Подписи и selection layout стабилизированы в последних правках.'
       ],
       next: [
         'Разбить LayoutEngine на модули без потери логики.',
@@ -426,13 +439,14 @@ export const catalog = [
     ],
     maturity: progressByProject.Genius.progress,
     execution: progressByProject.Genius.execution,
-    risk: 68,
+    risk: 66,
     timeline: ['Layout Engine', 'Runtime tests', 'Playground', 'Module split', 'Complex Families fix', 'Positions fix', 'Tests 64/64', 'Editor finish'],
     details: [
       'HOLO Current Focus прямо указывает Not Implemented: LOD, virtualization, mobile gestures.',
       'README заявляет [ ] Editor-minimum flow complete — значит итерация ещё не закрыта.',
       'docs/refactoring-plan.md описывает 4-этапный план рефакторинга LayoutEngine: модульное разбиение → generation fix → positions fix → тестирование.',
-      'runtime и спецификации сильные; главный долг — структурный, не функциональный.'
+      'runtime и спецификации сильные; главный долг — структурный, не функциональный.',
+      'Последние коммиты усилили стабильность подписей и selection layout.'
     ],
     commits: geniusCommits
   },
@@ -460,11 +474,12 @@ export const catalog = [
         'Перевести аналитические выводы в конкретные задачи разработки и убрать разрыв между текстом и исполнением.'
       ],
       device: 'Устройство MethodA похоже на правовую систему: есть канон, протокол действий, план, проверки и исполнение. Это делает проект особенно сильным там, где нужна повторяемость процесса, а не яркая оболочка или быстрый хаос; именно поэтому здесь так важна связка docs ↔ execution.',
-      done: [
-        'Закрыты M1–M5, M7 и M8.',
-        'Построен единый план и канон переведён на русский.',
-        'Добавлен E2E runner с сессиями и free models.'
-      ],
+    done: [
+      'Закрыты M1–M5, M7 и M8.',
+      'Построен единый план и канон переведён на русский.',
+      'Добавлен E2E runner с сессиями и free models.',
+      'OpenRouter включён в дефолтную конфигурацию.'
+    ],
       next: [
         'Интегрировать document-native session agent в methoda-mode.',
         'Сделать smoke conformance и ERT-минимум.',
@@ -514,7 +529,7 @@ export const catalog = [
     ],
     maturity: progressByProject.MethodA.progress,
     execution: progressByProject.MethodA.execution,
-    risk: 38,
+    risk: 36,
     timeline: ['Канон', 'Living doc', 'План/Протоколы', 'Emacs-mode integration', 'Smoke conformance', 'UX профиля', 'ERT-минимум'],
     details: [
       'M1–M5, M7, M8 отмечены как closed, но M6 (Emacs-mode integration) не закрыт.',

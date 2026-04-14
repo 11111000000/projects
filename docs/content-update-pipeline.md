@@ -114,6 +114,16 @@ After updates, verify:
 6. The public GitHub Pages URL after deployment
 7. The updated pages show the new fact and do not regress the old ones.
 
+## Visualization Data
+
+When the site needs refreshed charts or activity summaries, regenerate the derived JSON first:
+
+1. `npm run stats:llm` for request, model, monthly cost, and daily activity data from `stats.csv`
+2. `npm run stats:projects` for proof/activity summaries from the three source repos
+3. `npm run stats:collect` to run both collectors before `npm run build`
+
+Store only derived JSON in `dist/stats/`; do not hand-edit visualization numbers in page files.
+
 ## Agent Output Format
 
 When finishing an update, the agent should return:

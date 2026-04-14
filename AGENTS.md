@@ -68,6 +68,20 @@ curl -I https://11111000000.github.io/projects/
 
 ## Scripts
 
+### Statistics collection
+
+Use these to rebuild derived data for visualizations:
+
+```bash
+npm run stats:llm
+npm run stats:projects
+npm run stats:collect
+```
+
+- `stats:llm` reads `stats.csv` and writes `dist/stats/llm-stats.json`
+- `stats:projects` scans `~/Code/UHA-6.0`, `~/Code/Genius`, and `~/Code/MethodA` and writes `dist/stats/project-activity.json`
+- `stats:collect` runs both collectors in sequence
+
 ### e2e-check.cjs
 
 E2E browser testing with Playwright. Captures:

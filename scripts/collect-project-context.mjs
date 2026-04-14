@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 async function main() {
-  const file = process.argv[2] || 'stats-2026-04-12.csv';
+  const file = process.argv[2] || 'stats.csv';
   const text = await fs.readFile(path.resolve(process.cwd(), file), 'utf8');
   const lines = text.trim().split(/\r?\n/);
   const [header, ...rows] = lines;
