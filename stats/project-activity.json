@@ -1,0 +1,40 @@
+{
+  "projects": [
+    {
+      "name": "UHA-6.0",
+      "root": "/home/zoya/Code/UHA-6.0",
+      "files": [],
+      "proofCount": 0,
+      "frozenCount": 0,
+      "fluidCount": 0,
+      "todoCount": 0,
+      "commitLogLines": 0,
+      "recentCommits": [],
+      "recentProofs": []
+    },
+    {
+      "name": "Genius",
+      "root": "/home/zoya/Code/Genius",
+      "files": [],
+      "proofCount": 0,
+      "frozenCount": 0,
+      "fluidCount": 0,
+      "todoCount": 0,
+      "commitLogLines": 0,
+      "recentCommits": [],
+      "recentProofs": []
+    },
+    {
+      "name": "MethodA",
+      "root": "/home/zoya/Code/MethodA",
+      "files": [],
+      "proofCount": 0,
+      "frozenCount": 0,
+      "fluidCount": 0,
+      "todoCount": 0,
+      "commitLogLines": 0,
+      "recentCommits": [],
+      "recentProofs": []
+    }
+  ]
+}
